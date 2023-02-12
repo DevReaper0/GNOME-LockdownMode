@@ -1,0 +1,12 @@
+{
+  "name": "Lockdown Mode",
+  "description": "Change the GDM wallpaper to the desktop's wallpaper (with blur) depending on if dark mode is enabled.",
+  "url": "https://github.com/DaRubyMiner360/LockdownMode",
+  "uuid": "lockdown-mode@darubyminer360.gmail.com",
+  "shell-version": [
+    "42",
+    "43"
+  ],
+  "version": 1,
+  "settings-schema": "org.gnome.shell.extensions.lockdown-mode"
+}

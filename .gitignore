@@ -1,0 +1,10 @@
+*
+!.gitignore
+!README.md
+!extension.js
+!prefs.js
+!compile_schemas.sh
+!schemas
+!schemas/*
+schemas/gschemas.compiled
+!metadata.json

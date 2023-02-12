@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <enum id="org.gnome.shell.extensions.lockdown-mode.exit-mode">
+    <value value="0" nick="DELETE"/>
+    <value value="1" nick="KILL"/>
+    <value value="2" nick="MINIMIZE"/>
+    <value value="3" nick="HIDE_UNDER"/>
+  </enum>
+
+  <enum id="org.gnome.shell.extensions.lockdown-mode.exit-filter">
+    <value value="0" nick="ALL"/>
+    <value value="1" nick="NOT_HIDDEN"/>
+    <value value="2" nick="FOCUSED"/>
+  </enum>
+
+  <schema id="org.gnome.shell.extensions.lockdown-mode" path="/org/gnome/shell/extensions/lockdown-mode/">
+    <!-- See also: https://docs.gtk.org/glib/gvariant-format-strings.html -->
+    <key name="enabled" type="b">
+      <default>true</default>
+    </key>
+
+    <key name="only-once" type="b">
+      <default>false</default>
+    </key>
+
+    <key name="exit-mode" enum="org.gnome.shell.extensions.lockdown-mode.exit-mode">
+      <default>'MINIMIZE'</default>
+    </key>
+
+    <key name="exit-filter" enum="org.gnome.shell.extensions.lockdown-mode.exit-filter">
+      <default>'ALL'</default>
+    </key>
+  </schema>
+</schemalist>
