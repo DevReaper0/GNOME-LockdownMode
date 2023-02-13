@@ -12,32 +12,68 @@ function init() {
 function fillPreferencesWindow(window) {
     // Use the same GSettings schema as in `extension.js`
     const settings = ExtensionUtils.getSettings(
-        'org.gnome.shell.extensions.example');
+        'org.gnome.shell.extensions.lockdown-mode');
     
     // Create a preferences page and group
     const page = new Adw.PreferencesPage();
     const group = new Adw.PreferencesGroup();
     page.add(group);
 
-    // Create a new preferences row
-    const row = new Adw.ActionRow({ title: 'Show Extension Indicator' });
-    group.add(row);
+    {
+        const row = new Adw.ActionRow({ title: 'Only Once (For Debugging)' });
+        group.add(row);
 
-    // Create the switch and bind its value to the `show-indicator` key
-    const toggle = new Gtk.Switch({
-        active: settings.get_boolean ('show-indicator'),
-        valign: Gtk.Align.CENTER,
-    });
-    settings.bind(
-        'show-indicator',
-        toggle,
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
+        const toggle = new Gtk.Switch({
+            active: settings.get_boolean('only-once'),
+            valign: Gtk.Align.CENTER,
+        });
+        settings.bind(
+            'only-once',
+            toggle,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT
+        );
 
-    // Add the switch to the row
-    row.add_suffix(toggle);
-    row.activatable_widget = toggle;
+        row.add_suffix(toggle);
+        row.activatable_widget = toggle;
+    }
+    {
+        const row = new Adw.ActionRow({ title: 'Only Current Workspace' });
+        group.add(row);
+
+        const toggle = new Gtk.Switch({
+            active: settings.get_boolean('only-current-workspace'),
+            valign: Gtk.Align.CENTER,
+        });
+        settings.bind(
+            'only-current-workspace',
+            toggle,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT
+        );
+
+        row.add_suffix(toggle);
+        row.activatable_widget = toggle;
+    }
+    /*{
+        const row = new Adw.ActionRow({ title: 'Exit Mode' });
+        group.add(row);
+
+        const dropdown = new Gtk.ListBox({
+            //
+            valign: Gtk.Align.CENTER,
+        });
+        settings.bind(
+            'exit-mode',
+            dropdown,
+            //
+            Gio.SettingsBindFlags.DEFAULT
+        );
+
+        row.add_suffix(dropdown);
+        //
+    }*/
+    // TODO: Add exit-filter
 
     // Add our page to the window
     window.add(page);

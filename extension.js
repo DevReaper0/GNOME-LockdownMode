@@ -28,42 +28,13 @@ class Extension {
     constructor() {
         this.settings = ExtensionUtils.getSettings('org.gnome.shell.extensions.lockdown-mode');
         this._indicator = null;
-
-        /*// Create a checkbox for enabling/disabling the extension
-        let enableCheckbox = new St.Checkbox({ label: 'Close non-Brave windows', reactive: true });
-        enableCheckbox.connect('button-press-event', function() {
-            if (enableCheckbox.checked) {
-                enable();
-            } else {
-                disable();
-            }
-        });
-        Main.panel.addToStatusArea('close-non-brave-windows', enableCheckbox);
-
-        // Create a checkbox for toggling whether to keep checking or run once
-        let onlyOnceCheckbox = new St.Checkbox({ label: 'Run only once', reactive: true });
-        onlyOnceCheckbox.connect('button-press-event', function() {
-            onlyOnce = onlyOnceCheckbox.checked;
-        });
-        Main.panel.addToStatusArea('close-non-brave-windows-once', onlyOnceCheckbox);*/
     }
 
-    //checkWindows = () => {}
     checkWindows = () => {
-        if (this.settings.get_boolean('show-indicator')) {
-            log('[EXTENSION_LOG]', "E");
-            let windows = global.display.get_tab_list(Meta.TabList.NORMAL_ALL, null); // global.workspace_manager.get_active_workspace()
+        if (this.settings.get_boolean('enabled')) {
+            const windows = global.display.get_tab_list(Meta.TabList.NORMAL_ALL, this.settings.get_boolean('only-current-workspace') ? global.workspace_manager.get_active_workspace() : null);
             for (let i = 0; i < windows.length; i++) {
-                log('[EXTENSION_LOG]', JSON.stringify(windows[i]));
-                log('[EXTENSION_LOG]', windows[i].get_gtk_app_menu_object_path());
-                log('[EXTENSION_LOG]', windows[i].get_gtk_application_id());
-                log('[EXTENSION_LOG]', windows[i].get_gtk_application_object_path());
-                log('[EXTENSION_LOG]', windows[i].get_gtk_menubar_object_path());
-                log('[EXTENSION_LOG]', windows[i].get_gtk_window_object_path());
-                log('[EXTENSION_LOG]', windows[i].get_wm_class());
-                log('[EXTENSION_LOG]', windows[i].get_wm_class_instance());
-
-                if ((settings.get_enum('exit-filter') === ExitFilter.FOCUSED && !windows[i].has_focus()) || (settings.get_enum('exit-filter') === ExitFilter.NOT_HIDDEN && windows[i].is_hidden())) {
+                if ((this.settings.get_enum('exit-filter') === ExitFilter.FOCUSED && !windows[i].has_focus()) || (this.settings.get_enum('exit-filter') === ExitFilter.NOT_HIDDEN && windows[i].is_hidden())) {
                     continue;
                 }
 
@@ -88,13 +59,13 @@ class Extension {
                 // Check if the application executable is the Brave browser
                 // TODO: Don't hardcode this!
                 if (appExecutable != braveApp && appExecutable != "Brave-browser" && appExecutable != "Brave-browser-beta") {
-                    if (settings.get_enum('exit-mode') === ExitMode.HIDE_UNDER) {
+                    if (this.settings.get_enum('exit-mode') === ExitMode.HIDE_UNDER) {
                         windows[i].lower();
                     }
-                    else if (settings.get_enum('exit-mode') === ExitMode.MINIMIZE) {
+                    else if (this.settings.get_enum('exit-mode') === ExitMode.MINIMIZE) {
                         windows[i].minimize();
                     }
-                    else if (settings.get_enum('exit-mode') === ExitMode.KILL) {
+                    else if (this.settings.get_enum('exit-mode') === ExitMode.KILL) {
                         windows[i].kill();
                     }
                     else {
@@ -108,8 +79,8 @@ class Extension {
         timerId = Mainloop.timeout_add_seconds(5, this.checkWindows);
 
         // If set to run only once, disable the extension after first run
-        if (settings.get_boolean('only_once')) {
-            settings.set_boolean('enabled', false);
+        if (this.settings.get_boolean('only-once')) {
+            this.settings.set_boolean('enabled', false);
         }
     }
 
@@ -152,7 +123,7 @@ class FeatureToggle extends QuickSettings.QuickToggle {
     _init() {
         super._init({
             label: 'Lockdown Mode',
-            iconName: 'selection-mode-symbolic',
+            iconName: 'enabled',
             toggleMode: true,
         });
 
@@ -161,7 +132,7 @@ class FeatureToggle extends QuickSettings.QuickToggle {
             schema_id: 'org.gnome.shell.extensions.lockdown-mode',
         });
 
-        this._settings.bind('show-indicator',
+        this._settings.bind('enabled',
             this, 'checked',
             Gio.SettingsBindFlags.DEFAULT);
     }
@@ -181,7 +152,7 @@ class FeatureIndicator extends QuickSettings.SystemIndicator {
             schema_id: 'org.gnome.shell.extensions.lockdown-mode',
         });
 
-        this._settings.bind('show-indicator',
+        this._settings.bind('enabled',
             this._indicator, 'visible',
             Gio.SettingsBindFlags.DEFAULT);
         

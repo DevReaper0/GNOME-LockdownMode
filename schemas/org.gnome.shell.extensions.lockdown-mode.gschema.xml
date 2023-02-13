@@ -23,6 +23,10 @@
       <default>false</default>
     </key>
 
+    <key name="only-current-workspace" type="b">
+      <default>true</default>
+    </key>
+
     <key name="exit-mode" enum="org.gnome.shell.extensions.lockdown-mode.exit-mode">
       <default>'MINIMIZE'</default>
     </key>
