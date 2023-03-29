@@ -27,12 +27,20 @@
       <default>true</default>
     </key>
 
+    <key name="interval" type="d">
+      <default>5.0</default>
+    </key>
+
     <key name="exit-mode" enum="org.gnome.shell.extensions.lockdown-mode.exit-mode">
       <default>'MINIMIZE'</default>
     </key>
 
     <key name="exit-filter" enum="org.gnome.shell.extensions.lockdown-mode.exit-filter">
       <default>'ALL'</default>
+    </key>
+
+    <key name="whitelist" type="as">
+      <default>["Brave-browser", "Brave-browser-beta", "firefox", "Evince"]</default>
     </key>
   </schema>
 </schemalist>

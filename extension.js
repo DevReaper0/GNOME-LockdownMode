@@ -1,10 +1,7 @@
-const {Meta, Gio, St, GObject} = imports.gi;
+const { Meta, Gio, GObject } = imports.gi;
 const Mainloop = imports.mainloop;
 const QuickSettings = imports.ui.quickSettings;
 const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Main = imports.ui.main;
-const PanelMenu = imports.ui.panelMenu;
 
 // This is the live instance of the Quick Settings menu
 const QuickSettingsMenu = imports.ui.main.panel.statusArea.quickSettings;
@@ -57,8 +54,7 @@ class Extension {
                 }
 
                 // Check if the application executable is the Brave browser
-                // TODO: Don't hardcode this!
-                if (appExecutable != braveApp && appExecutable != "Brave-browser" && appExecutable != "Brave-browser-beta") {
+                if (appExecutable != braveApp && !this.settings.get_strv('whitelist').includes(appExecutable)) {
                     if (this.settings.get_enum('exit-mode') === ExitMode.HIDE_UNDER) {
                         windows[i].lower();
                     }
@@ -76,7 +72,7 @@ class Extension {
         }
 
         // Keep checking if enabled and not set to run only once
-        timerId = Mainloop.timeout_add_seconds(5, this.checkWindows);
+        timerId = Mainloop.timeout_add(this.settings.get_double('interval') * 1000, this.checkWindows);
 
         // If set to run only once, disable the extension after first run
         if (this.settings.get_boolean('only-once')) {
@@ -88,13 +84,12 @@ class Extension {
     enable() {
         this._indicator = new FeatureIndicator();
 
-        // Find the Brave browser app
+        // FIXME: The default browser stuff doesn't actually work right now
         let appSys = Gio.AppInfo.get_default_for_type('x-scheme-handler/http', true);
         braveApp = appSys.get_executable();
-        log('[EXTENSION_LOG]', braveApp);
 
-        // Start checking for non-Brave windows
-        timerId = Mainloop.timeout_add_seconds(5, this.checkWindows);
+        // Start checking for disallowed applications
+        timerId = Mainloop.timeout_add(this.settings.get_double('interval') * 1000, this.checkWindows);
     }
 
     disable() {
@@ -122,10 +117,11 @@ const FeatureToggle = GObject.registerClass(
 class FeatureToggle extends QuickSettings.QuickToggle {
     _init() {
         super._init({
-            label: 'Lockdown Mode',
-            iconName: 'enabled',
+            //label: 'Lockdown Mode',
+            iconName: 'window-close-symbolic',
             toggleMode: true,
         });
+        this.label = 'Lockdown Mode';
 
         // Binding the toggle to a GSettings key
         this._settings = new Gio.Settings({
@@ -145,7 +141,7 @@ class FeatureIndicator extends QuickSettings.SystemIndicator {
 
         // Create the icon for the indicator
         this._indicator = this._addIndicator();
-        this._indicator.icon_name = 'selection-mode-symbolic';
+        this._indicator.icon_name = 'window-close-symbolic';
 
         // Showing the indicator when the feature is enabled
         this._settings = new Gio.Settings({
